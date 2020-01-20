@@ -13,6 +13,10 @@ onMount(async function() {
 	const response = await fetch(ListAPI);
 	const json = await response.json();
 	data = json["Contents"];
+
+	const api_info_response = await fetch('api.json');
+	const api_info = await api_info_response.json();
+	console.log(api_info);
 });
 
 async function getImage(key) {
@@ -25,16 +29,17 @@ async function getImage(key) {
 		throw new Error(i);
 	}
 }
+
 </script>
 
 <main>
 	<h1>Photobook</h1>
 	<div>
-		{#each data as p_obj}
+		<!-- {#each data as p_obj}
 			{#await getImage(p_obj["Key"]) then i}
 				<img src="{i}" alt="" />
 			{/await}
-		{/each}
+		{/each} -->
 	</div>
 
 </main>

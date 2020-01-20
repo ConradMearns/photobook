@@ -3,7 +3,9 @@ import lambda = require('@aws-cdk/aws-lambda');
 import apigw = require('@aws-cdk/aws-apigateway');
 import s3 = require('@aws-cdk/aws-s3');
 import s3deploy = require('@aws-cdk/aws-s3-deployment')
-import { Duration, CfnOutput } from '@aws-cdk/core';
+import { Duration, CfnOutput, CfnCondition, Token, Fn, Lazy } from '@aws-cdk/core';
+
+import fs = require('fs');
 
 export class PhotobookStack extends cdk.Stack {
   constructor(scope: cdk.Construct, id: string, props?: cdk.StackProps) {
@@ -52,11 +54,12 @@ export class PhotobookStack extends cdk.Stack {
     }); 
 
     // API Gateway
-    new apigw.LambdaRestApi(this, 'ListObjectsApi', {
+    const list_api = new apigw.LambdaRestApi(this, 'ListObjectsApi', {
       handler: list_objects_python
     });
-    new apigw.LambdaRestApi(this, 'GetImageApi', { 
+    const get_api = new apigw.LambdaRestApi(this, 'GetImageApi', { 
       handler: get_image,
+      
       //binaryMediaTypes: ["image/jpeg"]
     }); 
 
@@ -66,6 +69,19 @@ export class PhotobookStack extends cdk.Stack {
     destBucket.grantReadWrite(get_image);
     destBucket.grantPublicAccess();
 
+  
+    const list_api_str = list_api.url;
+    // const list_api_str = Token.asString(list_api.deploymentStage);
+
+    // const fileOut = {
+    //   'list_endpoint': list_api_str,
+    //   // 'get_endpoint':  get_api.url,
+    // };
+    const fileOutData = JSON.stringify(list_api_str);
+    // const fileOutData = JSON.stringify(fileOut);
+    fs.writeFile('./web/public/api.json', fileOutData, (err) => {
+      if (err) throw err;
+    }); 
 
     // const list_objects_node = new lambda.Function(this, 'ListObjectsNode', {
     //   code: lambda.Code.fromAsset('lambda/list_objects_node'),

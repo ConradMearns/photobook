@@ -1,0 +1,9 @@
+{
+    "name": "mono",
+    "dependencies": {
+        "sharp": "^0.23.4"
+    },
+    "scripts": {
+        "locally": "node -e \"console.log(require('./index').handler({}));\""
+    }
+}
